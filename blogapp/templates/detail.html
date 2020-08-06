@@ -1,0 +1,36 @@
+<h1>{{blog.title}}</h1>
+<p>{{blog.created_at}}</p>
+<p>{{blog.updated_at}}</p>
+<p>{{blog.body}}</p>
+<p>{{blog.user}}</p>
+
+<a href="{% url 'main' %}">돌아가기</a>
+{% if user.is_authenticated %}
+<a href="{% url 'renew' blog.id %}">수정하기</a>
+<a href="{% url 'delete' blog.id %}">삭제하기</a>
+{% endif %}
+<br>
+
+{%for c in comment%}
+{%if c.anonymous == False%}
+<span>익명</span>
+{%else%}
+<span>{{c.user}}</span>
+{%endif%}
+{{c.content}}
+{%if request.user == c.user or request.user.is_staff %}
+<a href="{% url 'delete_comment' blog.id c.id %}">삭제하기</a>
+{%endif%}
+<br>
+{%endfor%}
+
+{% if user.is_authenticated %}
+<form method="POST" action="{% url 'comment_create' blog.id %}">
+    {% csrf_token %}
+    <input type="text" name="comment" placeholder="댓글을 입력하세요">
+    <input type="checkbox" name="anonymous" value="y">
+    <span style="font-size: 0.7em;">익명</span>
+
+    <input type="submit" value="submit">
+</form>
+{% endif %}
